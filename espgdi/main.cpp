@@ -2,7 +2,6 @@
 
 #include "offsets.h"
 #include <thread>
-#include <gdiplus.h>
 #include <iostream>
 
 
