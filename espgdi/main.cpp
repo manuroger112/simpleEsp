@@ -1,19 +1,14 @@
-#include "memory.h"
-
-#include "offsets.h"
 #include <thread>
 #include <iostream>
 
+#include "memory.h"
+#include "offsets.h"
 
 #define EnemyPen 0x000000FF
 HBRUSH EnemyBrush = CreateSolidBrush(0x000000FF);
 
-
-
 int width = 1920;
 int height = 1080;
-
-
 
 struct view_matrix_t {
 	float* operator[ ](int index) {
@@ -47,13 +42,10 @@ Vector3 WorldToScreen(const Vector3 pos, view_matrix_t matrix) {
 	return { x,y,w };
 }
 
-
-
 void DrawBorderBox(HDC hdc, int x, int y, int w, int h)
 {
 	Rectangle(hdc, x, y, w, h);
 }
-
 
 void DrawLine(HDC hdc, float StartX, float StartY, float EndX, float EndY)
 {
@@ -65,10 +57,6 @@ void DrawLine(HDC hdc, float StartX, float StartY, float EndX, float EndY)
 	a = LineTo(hdc, EndX, EndY); //end
 	DeleteObject(SelectObject(hdc, hOPen));
 }
-
-
-
-
 
 
 void draw(HDC hdc) {
@@ -84,13 +72,8 @@ void draw(HDC hdc) {
 
 	for (int i = 1; i < 64; i++)
 	{
-
 		
-
 		uintptr_t pEnt = VARS::memRead<DWORD>(VARS::baseAddress + offsets::dwEntityList + (i * 0x10));
-
-		
-
 		int health = VARS::memRead<int>(pEnt + offsets::m_iHealth);
 		int team = VARS::memRead<int>(pEnt + offsets::m_iTeamNum);
 
@@ -120,13 +103,7 @@ void draw(HDC hdc) {
 			DrawLine(hdc, width / 2, height, screenpos.x, screenpos.y);
 		}
 	}
-
-	
-
 }
-
-
-
 
 
 
@@ -134,8 +111,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HDC hdcBuffer = NULL;
 	static HBITMAP hbmBuffer = NULL;
-	
-
 	switch (message)
 	{
 		
@@ -146,7 +121,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdcBuffer = CreateCompatibleDC(NULL);
 		hbmBuffer = CreateCompatibleBitmap(GetDC(hWnd), width, height);
 		SelectObject(hdcBuffer, hbmBuffer);
-
 
 		// Set the window style to a layered window with an alpha channel
 		SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -167,7 +141,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 
-
 		/*
 		normal screen refreshing no double buffering
 		SetBkMode(hdc, TRANSPARENT);
@@ -178,9 +151,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		*/
 		
-		
-
-
 		//DOUBLE BUFFERING
 		FillRect(hdcBuffer, &ps.rcPaint, (HBRUSH)GetStockObject(WHITE_BRUSH));
 		
@@ -192,7 +162,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 	}
-	
 	case WM_DESTROY:
 		DeleteDC(hdcBuffer);
 		DeleteObject(hbmBuffer);
@@ -204,10 +173,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
-
-
-
-
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -222,7 +187,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hInstance = hInstance;
 	wc.lpszClassName = CLASS_NAME;
 	
-
 	RegisterClassEx(&wc);
 
 	// Create the window
@@ -232,31 +196,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (hWnd == NULL)
 		return 0;
 
-	
-	
-
 	SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	
-
-
-
-	
-
 	ShowWindow(hWnd, nCmdShow);
 
 	// Message loop
 	MSG msg;
-	
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		
 	}
-
 	return (int)msg.wParam;
-	
 }
 
 
